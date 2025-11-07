@@ -3,7 +3,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Fitness {
-    public final int far=80085;     //arbitrary number, ubah aja kalo mau
+    public final int far=100000;     //arbitrary number, ubah aja kalo mau
     int[][] layout;
     House[] houses;
     int[][][] distances;
@@ -31,44 +31,42 @@ public class Fitness {
         distancesFromHouse[house.xCoordinate][house.yCoordinate]=0;
         queue.offer(house);
         while(!queue.isEmpty()){
-
-            for (int i=queue.size();i>0;i--){
-                House top = queue.poll();
-                if (top.xCoordinate+1<layout.length){
-                    if (distancesFromHouse[top.xCoordinate+1][top.yCoordinate]==far){
-                        if (layout[top.xCoordinate+1][top.yCoordinate]==0){
-                            distancesFromHouse[top.xCoordinate+1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate+1,top.yCoordinate));
-                        }
+            House top = queue.poll();
+            if (top.xCoordinate+1<layout.length){
+                if (distancesFromHouse[top.xCoordinate+1][top.yCoordinate]==far){
+                    if (layout[top.xCoordinate+1][top.yCoordinate]==0){
+                        distancesFromHouse[top.xCoordinate+1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
+                        queue.offer(new House(top.xCoordinate+1,top.yCoordinate));
                     }
                 }
-                if (top.xCoordinate-1>=0){
-                    if (distancesFromHouse[top.xCoordinate-1][top.yCoordinate]==far){
-                        if (layout[top.xCoordinate-1][top.yCoordinate]==0){
-                            distancesFromHouse[top.xCoordinate-1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate-1,top.yCoordinate));
-                        }
+            }
+            if (top.xCoordinate-1>=0){
+                if (distancesFromHouse[top.xCoordinate-1][top.yCoordinate]==far){
+                    if (layout[top.xCoordinate-1][top.yCoordinate]==0){
+                        distancesFromHouse[top.xCoordinate-1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
+                        queue.offer(new House(top.xCoordinate-1,top.yCoordinate));
                     }
                 }
-                if (top.yCoordinate+1<layout[0].length){
-                    if (distancesFromHouse[top.xCoordinate][top.yCoordinate+1]==far){
-                        if (layout[top.xCoordinate][top.yCoordinate+1]==0){
-                            distancesFromHouse[top.xCoordinate][top.yCoordinate+1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate,top.yCoordinate+1));
-                        }
+            }
+            if (top.yCoordinate+1<layout[0].length){
+                if (distancesFromHouse[top.xCoordinate][top.yCoordinate+1]==far){
+                    if (layout[top.xCoordinate][top.yCoordinate+1]==0){
+                        distancesFromHouse[top.xCoordinate][top.yCoordinate+1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
+                        queue.offer(new House(top.xCoordinate,top.yCoordinate+1));
                     }
                 }
-                if (top.yCoordinate-1>=0){
-                    if (distancesFromHouse[top.xCoordinate][top.yCoordinate-1]==far){
-                        if (layout[top.xCoordinate][top.yCoordinate-1]==0){
-                            distancesFromHouse[top.xCoordinate][top.yCoordinate-1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate,top.yCoordinate-1));
-                        }
+            }
+            if (top.yCoordinate-1>=0){
+                if (distancesFromHouse[top.xCoordinate][top.yCoordinate-1]==far){
+                    if (layout[top.xCoordinate][top.yCoordinate-1]==0){
+                        distancesFromHouse[top.xCoordinate][top.yCoordinate-1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
+                        queue.offer(new House(top.xCoordinate,top.yCoordinate-1));
                     }
                 }
             } 
         }
     }
+    //ini fitness functionnya, bisa setelah preprocessing distance dari tiap kotak ke semua rumah (dilakukan di constructor)
     public int f(House[] firestations){
         int total=0;
         for (int i=0;i<houses.length;i++){
