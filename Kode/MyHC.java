@@ -93,6 +93,27 @@ public class MyHC {
     
     public static void main(String[] args) {
         // Random-restart Hill climbing 
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt(); //panjang map
+        int n = sc.nextInt(); //lebar map
+        int p = sc.nextInt(); //banyak fire station 
+        int h = sc.nextInt(); //banyak rumah 
+        int t = sc.nextInt(); //banyak pohon
+
+        House[] house = new House[h]; //inisialisasi array rumah
+        int[][] map = new int[m][n]; 
+        for (int i = 0; i < h; i++) { //masukan informasi koordinat rumah
+            int posX = sc.nextInt();
+            int posY = sc.nextInt();
+            house[i] = new House(posX - 1, posY - 1);
+            map[posX-1][posY-1] = 1;
+        }
+        for (int i = 0; i < t; i++) { //masukan informasi koordinat pohon
+            int posX = sc.nextInt();
+            int posY = sc.nextInt();
+            map[posX - 1][posY-1] = 2; 
+        }
+                
         double R2HC = randomRestartHC(20, 0.35, 100);
         System.out.printf("Hill Climbing best x=%.6f f(x)=%.6f%n", R2HC, f(R2HC));
 
