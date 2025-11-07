@@ -26,13 +26,13 @@ public class Kromosom implements Comparable<Kromosom>{
     }
 
     public void konversiFitness () {
-        int jarakTotal = storageHitunganFit.f(this.arrKromo);
-        if (jarakTotal == 1) {
-            this.fitness = Double.MAX_VALUE;
-        }
-        else {
-            this.fitness=1.0/jarakTotal;
-        }
+        int jarakTotal = storageHitunganFit.f(this.arrKromo);//mengembalikan totalfitnesss dari 1 kromosom
+        // if (jarakTotal == 1) {
+        //     this.fitness = Double.MAX_VALUE;
+        // }
+        // else {
+        //     this.fitness=1.0/jarakTotal;
+        // }
     }
 
     public House[] getArrKrom () {

@@ -66,10 +66,14 @@ public class Fitness {
             }
         }
     }
-    public int f(House fireStation1, House fireStation2){
+    public int f(House[] damkar){
         int total=0;
-        for (int i=0;i<houses.length;i++){
-            total+=Math.min(distances[i][fireStation1.x][fireStation1.y],distances[i][fireStation2.x][fireStation2.y]);
+        for (int i=0;i<damkar.length;i++){
+            int minDistance = far;
+            for(House fireStation:damkar){
+                minDistance=Math.min(minDistance,distances[i][fireStation.x][fireStation.y]);
+            }
+            total+=minDistance;
         }
         return total;
     }
