@@ -3,10 +3,10 @@ import java.util.Random;
 
 public class Kromosom implements Comparable<Kromosom>{
 
-    private House [] arrKromo;//Array yang akan memprestasikan Kromosom Yang berisikan gene, dan tiap genennya adlaah lokasi dari Fire Station, Intinya(1 kromosom berisi beberapan fire station)
+    private House [] arrKromo;//Array yang akan memprestasikan Kromosom Yang berisikan gene, dan tiap genennya adalah lokasi dari Fire Station, Intinya(1 kromosom berisi beberapan fire station)
     private double fitness = 0;
     private static Fitness storageHitunganFit;
-
+    
     public Kromosom (House [] lokasiLahanKosong, int banyakFireStation, Random rdm) {
         this.arrKromo = new House[banyakFireStation];
 
@@ -17,8 +17,8 @@ public class Kromosom implements Comparable<Kromosom>{
             lokasiGanda[i] = lokasiGanda[j];
             lokasiGanda[j] = storage;
         }
-
-        System.arraycopy(lokasiGanda, 0, this.arrKromo, 0, banyakFireStation);
+        //lokasiganda berisi lokasi damkar
+        System.arraycopy(lokasiGanda, 0, this.arrKromo, 0, banyakFireStation);//salin sebanyak firsestation array di lokasiganda ke arrKromo
     }
 
     public static void setStorageFit (Fitness n) {
