@@ -7,10 +7,13 @@ public class Kromosom implements Comparable<Kromosom>{
     private double fitness = 0;
     private static Fitness storageHitunganFit;
     
-    public Kromosom (House [] lokasiLahanKosong, int banyakFireStation, Random rdm) {
-        this.arrKromo = new House[banyakFireStation];
+    //mungkin lahankosong disini itu merupakan jumlah semua posisi lahan kosong yang bisa ditempati oleh firestation
+    public Kromosom (House [] lokasiLahanKosong,int FireStationNum,Random rdm) {
+        this.arrKromo = new House[lokasiLahanKosong.length];
 
         House [] lokasiGanda = lokasiLahanKosong.clone(); // Array buat naro nilai dari lokasikosong, buat jaga jaga
+
+        //fungsi ini untuk shuffle urutan firestation yang ada pada lokasiGanda
         for (int i = 0; i < lokasiLahanKosong.length; i++) {
             int j = rdm.nextInt(i + 1);
             House storage = lokasiGanda[i];
