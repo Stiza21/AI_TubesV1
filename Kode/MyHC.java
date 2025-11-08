@@ -1,250 +1,174 @@
 import java.util.*;
 
 public class MyHC {
-    static final Random rnd = new Random();
-    static final double MIN_X = -6.0;
-    static final double MAX_X = 6.0;
 
-    // Akan digantikan oleh class Fitness
-    // objective function (maximizing)
-    //f(x)=−0.2x^4 + 1.2x^3 − 1.1x^2 + 0.3x + 0.5sin(19x) + 0.75cos(13x)
-    static double f(double x) {
-        double term1 = -0.2 * (x*x*x*x);
-        double term2 =  1.2 * (x*x*x);
-        double term3 = -1.1 * (x*x);
-        double term4 =  0.3 * x;
-        double term5 =  0.5 * Math.sin(19*x);
-        double term6 =  0.75* Math.cos(13*x);
-        return term1 + term2 + term3 + term4 + term5 + term6;
-    }
+    /**
+     * Menghasilkan solusi awal acak yang valid untuk penempatan stasiun pemadam
+     * kebakaran.
+     * Solusi ini memastikan setiap stasiun pemadam kebakaran ditempatkan di lokasi
+     * yang valid
+     * (yaitu, tidak di atas rumah atau pohon). Solusi awal ini berfungsi sebagai
+     * titik awal untuk proses pencarian Hill Climbing.
+     *
+     * @param map Grid 2D yang mewakili lingkungan (rumah, pohon, tanah kosong)
+     * @param p   Jumlah stasiun pemadam kebakaran yang akan ditempatkan
+     * @return Array yang mewakili koordinat stasiun pemadam kebakaran sebagai
+     *         solusi awal
+     */
 
-    // Tak lagi digunakan dan nanti akan dihapus karena sudah tidak mendukung koordinat berbentuk grid 2 dimensi yang diskret
-    // pastikan x ada diantara MAX_X dan MIN_X;
-    static double clamp(double x) {
-        x = Math.max(MIN_X, x);
-        x = Math.min(x, MAX_X);
-        return x;
-    }
-    
-    // Akan digantikan oleh method generateInitialNeighbor
-    //alternatif mencari neighbor state di antara [-stepSize, stepSize]
-    static double getNeighbor(double currentX, double stepSize) {
-        double step = (rnd.nextDouble() * 2 * stepSize) - stepSize;
-        double newX = currentX + step;
-        newX = clamp(newX);
-        return newX;
-    }
-
-    // Dua method baru
-    /*
-        /**
-         * Menghasilkan solusi awal acak yang valid untuk penempatan stasiun pemadam kebakaran.
-         * Solusi ini memastikan setiap stasiun pemadam kebakaran ditempatkan di lokasi yang valid 
-         * (yaitu, tidak di atas rumah atau pohon). Solusi awal ini berfungsi sebagai 
-         * titik awal untuk proses pencarian Hill Climbing.
-         *
-         * @param map Grid 2D yang mewakili lingkungan (rumah, pohon, tanah kosong)
-         * @param p Jumlah stasiun pemadam kebakaran yang akan ditempatkan
-         * @return Array yang mewakili koordinat stasiun pemadam kebakaran sebagai solusi awal
-        */
-    /*
-        static House[] generateInitialSolution(int[][] layout, int p) {
-            List<int[]> emptyCells = new ArrayList<>();
-            for (int i = 0; i < layout.length; i++) {
-                for(int j = 0; j < layout[0].length; j++){
-                    if(layout[i][j] == 0) emptyCells.add(new int[]{i, j});
-                }
+    static House[] generateInitialSolution(int[][] layout, int p) {
+        List<int[]> emptyCells = new ArrayList<>();
+        for (int i = 0; i < layout.length; i++) {
+            for (int j = 0; j < layout[0].length; j++) {
+                if (layout[i][j] == 0)
+                    emptyCells.add(new int[] { i, j });
             }
-            Collections.shuffle(emptyCells);
-            House[] stations = new House[p];
-            for(int k = 0; k < p; k++){
-                int[] pos = emptyCells.get(k);
-                stations[k] = new House(pos[0], pos[1]);
-            }
-            return stations;
         }
-        */
-    /*
-        /**
-         * Menghasilkan semua solusi tetangga yang valid dari solusi saat ini.
-         * Solusi tetangga diperoleh dengan memindahkan satu stasiun pemadam kebakaran satu langkah ke salah satu 
-         * dari empat arah (atas, bawah, kiri, kanan) tanpa tumpang tindih 
-         * dengan petak yang tidak valid (seperti pohon atau rumah).
-         *
-         * @param currentSolution Penempatan stasiun pemadam kebakaran saat ini
-         * @param map Grid 2D yang mewakili lingkungan
-         * @return Daftar solusi tetangga yang dihasilkan dari solusi saat ini
-        */
-    /*
-        static List<House[]> generateNeighbors(House[] currentStations, int[][] layout) {
-            List<House[]> neighbors = new ArrayList<>();
-            int[][] moves = { {1,0}, {-1,0}, {0,1}, {0,-1} }; // 4-arah perpindahan
+        Collections.shuffle(emptyCells);
+        House[] stations = new House[p];
+        for (int k = 0; k < p; k++) {
+            int[] pos = emptyCells.get(k);
+            stations[k] = new House(pos[0], pos[1]);
+        }
+        return stations;
+    }
 
-            for(int i = 0; i < currentStations.length; i++){
-                for(int[] move : moves){
-                    int newX = currentStations[i].x + move[0];
-                    int newY = currentStations[i].y + move[1];
-                    if (newX >= 0 && newX < layout.length && newY >= 0 && newY < layout[0].length){
-                        if (layout[newX][newY] == 0) { // empty cell only
-                            House[] neighbor = new House[currentStations.length];
-                            for (int k = 0; k < currentStations.length; k++){
-                                neighbor[k] = new House(currentStations[k].x, currentStations[k].y);
-                            }
-                            neighbor[i] = new House(newX, newY);
-                            neighbors.add(neighbor);
+    /**
+     * Menghasilkan semua solusi tetangga yang valid dari solusi saat ini.
+     * Solusi tetangga diperoleh dengan memindahkan satu stasiun pemadam kebakaran
+     * satu langkah ke salah satu
+     * dari empat arah (atas, bawah, kiri, kanan) tanpa tumpang tindih
+     * dengan petak yang tidak valid (seperti pohon atau rumah).
+     *
+     * @param currentSolution Penempatan stasiun pemadam kebakaran saat ini
+     * @param map             Grid 2D yang mewakili lingkungan
+     * @return Daftar solusi tetangga yang dihasilkan dari solusi saat ini
+     */
+
+    static List<House[]> generateNeighbors(House[] currentStations, int[][] layout) {
+        List<House[]> neighbors = new ArrayList<>();
+        int[][] moves = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }; // 4-arah perpindahan
+
+        for (int i = 0; i < currentStations.length; i++) {
+            for (int[] move : moves) {
+                int newX = currentStations[i].xCoordinate + move[0];
+                int newY = currentStations[i].yCoordinate + move[1];
+                if (newX >= 0 && newX < layout.length && newY >= 0 && newY < layout[0].length) {
+                    if (layout[newX][newY] == 0) { // empty cell only
+                        House[] neighbor = new House[currentStations.length];
+                        for (int k = 0; k < currentStations.length; k++) {
+                            neighbor[k] = new House(currentStations[k].xCoordinate, currentStations[k].yCoordinate);
                         }
+                        neighbor[i] = new House(newX, newY);
+                        neighbors.add(neighbor);
                     }
                 }
             }
-            return neighbors;
         }
-    */
+        return neighbors;
+    }
 
-    // Method Hill Climbing lama
-    /**
-    * Hill Climbing
-    * @param stepSize berapa jauh "lompat" ke tetangga
-    * @param maxIter iterasi maksimum
-    * @return x dengan f(x) terbesar
-    */	
-    static double hillClimbing(double stepSize, int maxIter) {
-        double randPos = MIN_X + (rnd.nextDouble() * (MAX_X - MIN_X)); 	//posisi awal: random
-        System.out.printf("Initial posistion: %.6f\n",randPos);
-
-        double bestX = clamp(randPos); 	//pastikan awalnya di antara MIN_X - MAX_X
-        double bestF = f(bestX);			//hitung f(x)-nya
-        for (int it=1; it<=maxIter; it++) { //lakukan sampai maxIter
-            
-            //buat neighbor state-nya --> bisa gunakan getNeighbor()
-            double leftX = clamp(bestX - stepSize);	//tetangga kiri
-            double rightX = clamp(bestX + stepSize);	//tetangga kanan
-            double leftF = f(leftX);			//hitung f()-nya
-            double rightF = f(rightX);
-            
-            if (leftF > bestF) {	//tetangga kiri lebih baik
-                bestX = leftX; 
-                bestF = leftF;
-            } else if (rightF > bestF) { //tetangga kanan lebih baik 
-                bestX = rightX; 
-                bestF = rightF;
-            } else {	//local maximum?
-                stepSize = stepSize * 0.5; //kurangi step
-            }
-        }
-        return bestX;
-    }    
-    
     // Method Hill Climbing baru
-    /*
-        /**
-         * Hill Climbing
-         * @param map Grid 2D yang mewakili lingkungan
-         * @param p Jumlah stasiun pemadam kebakaran
-         * @param maxIter Jumlah iterasi maksimum yang diizinkan
-         * @return Solusi terbaik yang ditemukan (posisi stasiun pemadam kebakaran) dengan nilai fitness tertinggi
-        */
-    /*
-        static House[] hillClimbing(Fitness fitness, int[][] layout, int p, int maxIter) {
-            House[] current = generateInitialSolution(layout, p);
-            double bestScore = fitness.f(current);
 
-            for(int iter = 0; iter < maxIter; iter++){
-                List<House[]> neighbors = generateNeighbors(current, layout);
-                boolean improved = false;
-
-                for(House[] neighbor : neighbors){
-                    double score = fitness.f(neighbor);
-                    if(score < bestScore){
-                        bestScore = score;
-                        current = neighbor;
-                        improved = true;
-                        break;
-                    }
-                }
-                if(!improved) break; // local minimum
-            }
-            return current;
-        }
-     
-    */
-
-    // Method random restart lama
     /**
-    * random restart hill climbing
-    * @param nRestarts berapa kali melakukan hill climbing
-    * @param step berapa jauh "lompat" ke tetangga
-    * @param runs iterasi maksimum
-    * @return x dengan f(x) terbesar
-    */
-    static double randomRestartHC(int nRestarts, double step, int iter) {
-        double bestX = MIN_X;	//x terbaik saat ini
-        double bestF = f(bestX);	//f(x)-nya
-        
-        for (int r=1; r<=nRestarts; r++) { //ulangi nRestarts kali
-            System.out.printf("Run %d\n",r);
-            double x = hillClimbing(step, iter);	//x terbaik hasil HC
-            double fx = f(x);	//f(x)-nya
-            System.out.printf("Hill Climbing result: best x=%.6f f(x)=%.6f%n",x,fx);
-            System.out.println("----------------------------------------------");
-            if (fx>bestF) { //simpan f(x) terbaik;
-                bestF = fx; 
-                bestX = x; 
+     * Hill Climbing
+     * 
+     * @param map     Grid 2D yang mewakili lingkungan
+     * @param p       Jumlah stasiun pemadam kebakaran
+     * @param maxIter Jumlah iterasi maksimum yang diizinkan
+     * @return Solusi terbaik yang ditemukan (posisi stasiun pemadam kebakaran)
+     *         dengan nilai fitness tertinggi
+     */
+
+    static House[] hillClimbing(Fitness fitness, int[][] layout, int p, int maxIter) {
+        House[] current = generateInitialSolution(layout, p);
+        double bestScore = fitness.f(current);
+
+        for (int iter = 0; iter < maxIter; iter++) {
+            List<House[]> neighbors = generateNeighbors(current, layout);
+            boolean improved = false;
+
+            for (House[] neighbor : neighbors) {
+                double score = fitness.f(neighbor);
+                if (score < bestScore) {
+                    bestScore = score;
+                    current = neighbor;
+                    improved = true;
+                    break;
+                }
             }
+            if (!improved)
+                break; // local minimum
         }
-        return bestX;
+        return current;
     }
 
     // Method random restart baru
-    /*
-        /**
-         * @param map Peta grid 2D yang mewakili lingkungan
-         * @param p Jumlah stasiun pemadam kebakaran
-         * @param nRestarts Jumlah restart acak yang akan dilakukan
-         * @param maxIter Jumlah iterasi maksimum per eksekusi Hill Climbing
-         * @return Solusi terbaik secara keseluruhan yang ditemukan dari semua restart
-        */
-    /*
-        static House[] randomRestartHC(int nRestarts, Fitness fitness, int[][] layout, int p, int maxIter) {
-            House[] bestSolution = null;
-            double bestScore = Double.MAX_VALUE;
 
-            for(int r = 0; r < nRestarts; r++){
-                House[] solution = hillClimbing(fitness, layout, p, maxIter);
-                double score = fitness.f(solution);
-                if(score < bestScore){
-                    bestScore = score;
-                    bestSolution = solution;
-                }
+    /**
+     * @param map       Peta grid 2D yang mewakili lingkungan
+     * @param p         Jumlah stasiun pemadam kebakaran
+     * @param nRestarts Jumlah restart acak yang akan dilakukan
+     * @param maxIter   Jumlah iterasi maksimum per eksekusi Hill Climbing
+     * @return Solusi terbaik secara keseluruhan yang ditemukan dari semua restart
+     */
+
+    static House[] randomRestartHC(int nRestarts, Fitness fitness, int[][] layout, int p, int maxIter) {
+        House[] bestSolution = null;
+        double bestScore = Double.MAX_VALUE;
+
+        for (int r = 0; r < nRestarts; r++) {
+            House[] solution = hillClimbing(fitness, layout, p, maxIter);
+            double score = fitness.f(solution);
+            if (score < bestScore) {
+                bestScore = score;
+                bestSolution = solution;
             }
-            return bestSolution;
         }
-    */
-    
-    public static void main(String[] args) {
-        // Random-restart Hill climbing 
-        Scanner sc = new Scanner(System.in);
-        int m = sc.nextInt(); //panjang map
-        int n = sc.nextInt(); //lebar map
-        int p = sc.nextInt(); //banyak fire station 
-        int h = sc.nextInt(); //banyak rumah 
-        int t = sc.nextInt(); //banyak pohon
+        return bestSolution;
+    }
 
-        House[] house = new House[h]; //inisialisasi array rumah
-        int[][] map = new int[m][n]; 
-        for (int i = 0; i < h; i++) { //masukan informasi koordinat rumah
+    public static void main(String[] args) {
+        // Random-restart Hill climbing
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt(); // panjang map
+        int n = sc.nextInt(); // lebar map
+        int p = sc.nextInt(); // banyak fire station
+        int h = sc.nextInt(); // banyak rumah
+        int t = sc.nextInt(); // banyak pohon
+        
+        House[] house = new House[h]; // inisialisasi array rumah
+        int[][] map = new int[m][n];
+        for (int i = 0; i < h; i++) { // masukan informasi koordinat rumah
             int posX = sc.nextInt();
             int posY = sc.nextInt();
             house[i] = new House(posX - 1, posY - 1);
-            map[posX-1][posY-1] = 1;
+            map[posX - 1][posY - 1] = 1;
         }
-        for (int i = 0; i < t; i++) { //masukan informasi koordinat pohon
+        for (int i = 0; i < t; i++) { // masukan informasi koordinat pohon
             int posX = sc.nextInt();
             int posY = sc.nextInt();
-            map[posX - 1][posY-1] = 2; 
+            map[posX - 1][posY - 1] = 2;
         }
-        Fitness fitnessVal = new Fitness(map,house);
-        double R2HC = randomRestartHC(20, fitnessVal, map, p, 100);
-        System.out.printf("Hill Climbing best x=%.6f f(x)=%.6f%n", R2HC, f(R2HC));
+        Fitness fitnessVal = new Fitness(map, house);
+
+        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[0]));
+        double totalDist = 0.0;
+        for (House home : house) {
+            int minDist = Integer.MAX_VALUE;
+            for (House fireStation : bestStations) {
+                int d = fitnessVal.distances[Arrays.asList(house).indexOf(home)][fireStation.xCoordinate][fireStation.yCoordinate];
+                if (d < minDist)
+                    minDist = d;
+            }
+            totalDist += minDist;
+        }
+
+        double avgDist = totalDist / h; //cari rata2 terdekat untuk jarak rumah dengan fire station
+        System.out.printf("%d %.5f%n", p, avgDist); //output jumlah firestation dan rata2 jarak dengan rumah 
+        for (House fireStation : bestStations) {
+            System.out.printf("%d %d%n", fireStation.xCoordinate + 1, fireStation.yCoordinate + 1);//output koordinat dengan firestation
+        }
 
     }
 }
