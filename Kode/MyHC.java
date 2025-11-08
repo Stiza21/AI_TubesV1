@@ -242,8 +242,8 @@ public class MyHC {
             int posY = sc.nextInt();
             map[posX - 1][posY-1] = 2; 
         }
-                
-        double R2HC = randomRestartHC(20, 0.35, 100);
+        Fitness fitnessVal = new Fitness(map,house);
+        double R2HC = randomRestartHC(20, fitnessVal, map, p, 100);
         System.out.printf("Hill Climbing best x=%.6f f(x)=%.6f%n", R2HC, f(R2HC));
 
     }
