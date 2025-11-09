@@ -8,9 +8,9 @@ public class Kromosom implements Comparable<Kromosom>{
     private static Fitness storageHitunganFit;
     
     //mungkin lahankosong disini itu merupakan jumlah semua posisi lahan kosong yang bisa ditempati oleh firestation
-    public Kromosom (House [] lokasiLahanKosong,int banyakFireStation,Random rdm) {
+    public Kromosom (House [] lokasiLahanKosong,int banyakFireStation) {
         this.arrKromo = new House[lokasiLahanKosong.length];
-
+        Random rdm=new Random();
         House [] lokasiGanda = lokasiLahanKosong.clone(); // Array buat naro nilai dari lokasikosong, buat jaga jaga
 
         //fungsi ini untuk shuffle urutan firestation yang ada pada lokasiGanda
@@ -31,6 +31,7 @@ public class Kromosom implements Comparable<Kromosom>{
 
     public void konversiFitness () {
         int jarakTotal = storageHitunganFit.f(this.arrKromo);//mengembalikan totalfitnesss dari 1 kromosom
+        this.fitness=jarakTotal;
         // if (jarakTotal == 1) {
         //     this.fitness = Double.MAX_VALUE;
         // }
@@ -46,6 +47,16 @@ public class Kromosom implements Comparable<Kromosom>{
     public double getnewFitness () {
         return this.fitness;
     }
+
+    public House getGene(int a){
+        return arrKromo[a];
+    }
+
+    public void setGene(int a,House input){
+        this.arrKromo[a]=input;
+    }
+
+
 
     @Override
     public int compareTo(Kromosom o) {
