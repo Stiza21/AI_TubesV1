@@ -15,8 +15,10 @@ public class MyHC {
      * @return Array yang mewakili koordinat stasiun pemadam kebakaran sebagai
      *         solusi awal
      */
+    static Random rng; //global var untuk mengambil seed random
+    static int seedUsed; //agar rng bisa diubah menjadi integer untuk output
 
-    static House[] generateInitialSolution(int[][] layout, int p) {
+    static House[] generateInitialSolution(int[][] layout, int p, int seed) {
         List<int[]> emptyCells = new ArrayList<>();
         for (int i = 0; i < layout.length; i++) {
             for (int j = 0; j < layout[0].length; j++) {
@@ -24,7 +26,9 @@ public class MyHC {
                     emptyCells.add(new int[] { i, j });
             }
         }
-        Collections.shuffle(emptyCells);
+        seedUsed = seed;
+        rng = new Random(seed);
+        Collections.shuffle(emptyCells, rng);
         House[] stations = new House[p];
         for (int k = 0; k < p; k++) {
             int[] pos = emptyCells.get(k);
@@ -76,12 +80,13 @@ public class MyHC {
      * @param map     Grid 2D yang mewakili lingkungan
      * @param p       Jumlah stasiun pemadam kebakaran
      * @param maxIter Jumlah iterasi maksimum yang diizinkan
+     * @param seed    Seed 
      * @return Solusi terbaik yang ditemukan (posisi stasiun pemadam kebakaran)
      *         dengan nilai fitness tertinggi
      */
 
-    static House[] hillClimbing(Fitness fitness, int[][] layout, int p, int maxIter) {
-        House[] current = generateInitialSolution(layout, p);
+    static House[] hillClimbing(Fitness fitness, int[][] layout, int p, int maxIter, int seed) {
+        House[] current = generateInitialSolution(layout, p, seed);
         double bestScore = fitness.f(current);
 
         for (int iter = 0; iter < maxIter; iter++) {
@@ -113,12 +118,13 @@ public class MyHC {
      * @return Solusi terbaik secara keseluruhan yang ditemukan dari semua restart
      */
 
-    static House[] randomRestartHC(int nRestarts, Fitness fitness, int[][] layout, int p, int maxIter) {
+    static House[] randomRestartHC(int nRestarts, Fitness fitness, int[][] layout, int p, int maxIter, Random seedRandomizer) {
         House[] bestSolution = null;
         double bestScore = Double.MAX_VALUE;
-
+        
         for (int r = 0; r < nRestarts; r++) {
-            House[] solution = hillClimbing(fitness, layout, p, maxIter);
+            int seed = seedRandomizer.nextInt(100000); //jika ingin manual seeds ubah disini 
+            House[] solution = hillClimbing(fitness, layout, p, maxIter, seed);
             double score = fitness.f(solution);
             if (score < bestScore) {
                 bestScore = score;
@@ -151,8 +157,8 @@ public class MyHC {
             map[posX - 1][posY - 1] = 2;
         }
         Fitness fitnessVal = new Fitness(map, house);
-
-        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[0]));
+        Random seedRandomizer = new Random(); //pilih seed secara random dengan rentang seperti pada parameter (random)
+        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[0]), seedRandomizer);//random
         double totalDist = 0.0;
         for (House home : house) {
             int minDist = Integer.MAX_VALUE;
@@ -163,8 +169,9 @@ public class MyHC {
             }
             totalDist += minDist;
         }
-
+        
         double avgDist = totalDist / h; //cari rata2 terdekat untuk jarak rumah dengan fire station
+        System.out.println("Seed : " + seedUsed);
         System.out.printf("%d %.5f%n", p, avgDist); //output jumlah firestation dan rata2 jarak dengan rumah 
         for (House fireStation : bestStations) {
             System.out.printf("%d %d%n", fireStation.xCoordinate + 1, fireStation.yCoordinate + 1);//output koordinat dengan firestation
