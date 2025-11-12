@@ -1,4 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MyHC {
 
@@ -134,9 +137,9 @@ public class MyHC {
         return bestSolution;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         // Random-restart Hill climbing
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(new File("input.txt")); // read map from file
         int m = sc.nextInt(); // panjang map
         int n = sc.nextInt(); // lebar map
         int p = sc.nextInt(); // banyak fire station
@@ -157,7 +160,9 @@ public class MyHC {
             map[posX - 1][posY - 1] = 2;
         }
         Fitness fitnessVal = new Fitness(map, house);
-        Random seedRandomizer = new Random(); //pilih seed secara random dengan rentang seperti pada parameter (random)
+
+        int mainSeed = (args.length > 1) ? Integer.parseInt(args[1]) : ThreadLocalRandom.current().nextInt(10000, 99999);
+        Random seedRandomizer = new Random(mainSeed); //pilih seed secara random dengan rentang seperti pada parameter (random)
         House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[0]), seedRandomizer);//random
         double totalDist = 0.0;
         for (House home : house) {
@@ -171,6 +176,7 @@ public class MyHC {
         }
         
         double avgDist = totalDist / h; //cari rata2 terdekat untuk jarak rumah dengan fire station
+        System.out.println("Main seed : " + mainSeed);
         System.out.println("Seed : " + seedUsed);
         System.out.printf("%d %.5f%n", p, avgDist); //output jumlah firestation dan rata2 jarak dengan rumah 
         for (House fireStation : bestStations) {
