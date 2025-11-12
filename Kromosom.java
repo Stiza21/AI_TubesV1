@@ -44,6 +44,10 @@ public class Kromosom implements Comparable<Kromosom>{
         return this.arrKromo;
     }
 
+    public int getSize(){
+        return this.arrKromo.length;
+    }
+
     public double getnewFitness () {
         return this.fitness;
     }
