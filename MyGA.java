@@ -13,6 +13,8 @@ private static int fireStationNum;
 private int ukuranPopulasi;
 private Random rdm;
 private ArrayList <Kromosom> populasi;
+
+//population berisi arrayList
     public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,int ukuranPopulasi){
         this.fitness=fitness;
         this.lokasiKosong=lokasiKosong;
@@ -33,7 +35,7 @@ private ArrayList <Kromosom> populasi;
 
 
     public void population(){
-             populasi = new ArrayList<>();
+             populasi = new ArrayList<>();//dibuat arraylist karena jumlah firestation pada awalnya tidak diketahui
         for (int i = 0; i < ukuranPopulasi; i++) {
             populasi.add(new Kromosom(lokasiKosong, fireStationNum));
         }
@@ -42,10 +44,13 @@ private ArrayList <Kromosom> populasi;
     }
 
     public void CrossOver(Kromosom [] nextPopulation){
-        Kromosom parent1 = populasi.get(rdm.nextInt(populasi.size()));
-        Kromosom parent2 = populasi.get(rdm.nextInt(populasi.size()));
+
+                 for(int a= 1;a<nextPopulation.length;a++){
+        double randomValue = rdm.nextDouble();//untuk menentukan apakah akan crossover atau tidak && double.rdmvalue diantara 0 sampai 1
+        if(randomValue<Crossrate){
+         Kromosom parent1 = Tournament();
+        Kromosom parent2 = Tournament();
          int point = rdm.nextInt(populasi.size());//poin untuk crossover 
-         for(int a= 1;a<nextPopulation.length;a++){
                 if(a<point){
                    House gene = parent1.getGene(a); 
                     nextPopulation[a].setGene(a,gene);
@@ -53,10 +58,50 @@ private ArrayList <Kromosom> populasi;
                      House gene = parent2.getGene(a); 
                     nextPopulation[a].setGene(a,gene);
                 }
+        }
          }
-
-
     }
+
+    public Kromosom Tournament(){
+        Kromosom best = null;
+        int participantNum =3;
+
+         //pilih beberapa individu untuk ikut tournament   
+        for(int a=0;a<participantNum;a++){
+            Kromosom participant = populasi.get(rdm.nextInt(populasi.size()));
+            if(participant.compareTo(best)>0){//jika nilai fitness nya lebih kecil/lebih baik 
+                best=participant;
+            }
+        }
+        return best;
+    }
+
+       public void Mutasi(Kromosom [] nextPopulation) {
+    for (int i = 1; i < nextPopulation.length; i++) { //index 0 untuk elitism
+        Kromosom krom = nextPopulation[i];
+        for (int j = 0; j < fireStationNum; j++) {
+            double r = rdm.nextDouble(); //mengambil nilai 0 sampai 1 untuk perbandingan dengan mutationrate
+            if (r < mutationRate) {
+                // ganti gen dengan lokasi baru secara acak
+                House newGene = lokasiKosong[rdm.nextInt(lokasiKosong.length)];//membuat lokasi firestation baru yang akan digunakan untuk proses mutasi dari lahan kosong yang tersedia sehingga tidak terjadi penumpukan firestation dengan objek lain
+                krom.setGene(j, newGene);
+            }
+        }
+    }
+}
+
+
+    public Kromosom getBest() {
+        Kromosom best = null;
+        for (Kromosom k : populasi) {
+            if (best == null ||k.getnewFitness() < best.getnewFitness()) {
+                best = k;
+            }
+        }
+        return best;
+    }
+
+ 
        
     }
 
