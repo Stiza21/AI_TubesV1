@@ -25,6 +25,10 @@ public class Kromosom implements Comparable<Kromosom>{
         konversiFitness();//langsung itung fitnessnya
     }
 
+    public Kromosom(House [] lokasiFireStation){
+        this.arrKromo=lokasiFireStation;
+    }
+
     public static void setStorageFit (Fitness n) {
         storageHitunganFit = n;
     }

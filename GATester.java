@@ -6,41 +6,61 @@ import java.util.Scanner;
 
 public class GATester {
     public static void main(String[] args) throws FileNotFoundException {
-        String input = "Input.txt";
 
-        int m=0;
-        int n=0;
-        int p=0;
-        int h=0;
-        int t=0;
+        int m = 0;
+        int n = 0;
+        int p = 0;
+        int h = 0;
+        int t = 0;
 
-        int [][] layout;
-        House [] rumah;
+        int[][] layout;
+        House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
+        Scanner sc = new Scanner(new File("Kode/Input.txt"));
 
-        Scanner sc = new Scanner(new File(input));
         if (sc.hasNextInt()) m = sc.nextInt();
-            if (sc.hasNextInt()) n = sc.nextInt();
-            
-            if (sc.hasNextInt()) p = sc.nextInt();
-            if (sc.hasNextInt()) h = sc.nextInt();
-            if (sc.hasNextInt()) t = sc.nextInt();
+        if (sc.hasNextInt()) n = sc.nextInt();
+        if (sc.hasNextInt()) p = sc.nextInt();
+        if (sc.hasNextInt()) h = sc.nextInt();
+        if (sc.hasNextInt()) t = sc.nextInt();
 
-            layout = new int[m][n];
-            rumah= new House[h];
+        layout = new int[m][n];
+        rumah = new House[h];
 
-            //input Lokasi Rumah
-            for (int i = 0; i < h; i++) {
-                int x = sc.nextInt() - 1; // Konversi 1-based ke 0-based
-                int y = sc.nextInt() - 1;
-                rumah[i] = new House(x, y);
+        // input Lokasi Rumah
+        for (int i = 0; i < h; i++) {
+            int x = sc.nextInt() - 1; // Konversi 1-based ke 0-based
+            int y = sc.nextInt() - 1;
+            rumah[i] = new House(x, y);
+            layout[x][y] = 1;
+        }
+
+        // input lokasi pohon
+        for (int i = 0; i < t; i++) {
+            int x = sc.nextInt() - 1; // Konversi 1-based ke 0-based
+            int y = sc.nextInt() - 1;
+            layout[x][y] = 2; 
+        }
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (layout[i][j] == 0) {
+                    lokasiKosong.add(new House(i, j));
+                }
             }
+        }
 
-            //input lokasi pohon
-            for (int i = 0; i < t; i++) {
-                int x = sc.nextInt() - 1; // Konversi 1-based ke 0-based
-                int y = sc.nextInt() - 1;
-            }
-            
+        Fitness fitness = new Fitness(layout, rumah);
+
+        MyGA genetika = new MyGA(fitness, rumah, p, 0.8, 0.8, 6);
+          Kromosom bestKromosom = null;
+
+        for(int a=0;a<3;a++){
+            genetika.Genetics();
+            bestKromosom = genetika.getBest();
+            System.out.printf("Generasi %d: Best Fitness (Total Jarak) = %.0f\n", a + 1, bestKromosom.getnewFitness());
+        }
+
+
     }
 }

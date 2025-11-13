@@ -28,9 +28,9 @@ private ArrayList <Kromosom> populasi;
         population();
         Kromosom best = populasi.get(0);//ELITISM AMBIL YANG TERBAIK
          Kromosom [] nextPopulation = new Kromosom[populasi.size()];//kromosom child
-         nextPopulation[0]= best ;
-         
+         nextPopulation[0]= best ;//elitism
         CrossOver(nextPopulation);
+        Mutasi(nextPopulation);
     }
 
 
@@ -45,18 +45,20 @@ private ArrayList <Kromosom> populasi;
 
     public void CrossOver(Kromosom [] nextPopulation){
 
-                 for(int a= 1;a<nextPopulation.length;a++){
+         for(int a= 1;a<nextPopulation.length;a++){
         double randomValue = rdm.nextDouble();//untuk menentukan apakah akan crossover atau tidak && double.rdmvalue diantara 0 sampai 1
         if(randomValue<Crossrate){
-         Kromosom parent1 = Tournament();
+        Kromosom parent1 = Tournament();
         Kromosom parent2 = Tournament();
-         int point = rdm.nextInt(populasi.size());//poin untuk crossover 
+        Kromosom anak1 = new Kromosom(new House[fireStationNum]);
+        Kromosom anak2 = new Kromosom(new House[fireStationNum]);
+         int point = rdm.nextInt(parent1.getSize());//poin untuk crossover 
                 if(a<point){
-                   House gene = parent1.getGene(a); 
-                    nextPopulation[a].setGene(a,gene);
+                   anak1.setGene(a,parent1.getGene(a));
+                   anak2.setGene(a,parent2.getGene(a));
                 }else{
-                     House gene = parent2.getGene(a); 
-                    nextPopulation[a].setGene(a,gene);
+                   anak1.setGene(a,parent2.getGene(a));
+                   anak2.setGene(a,parent1.getGene(a));
                 }
         }
          }
