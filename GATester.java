@@ -16,7 +16,7 @@ public class GATester {
         int[][] layout;
         House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
-        Scanner sc = new Scanner(new File("Kode/Input.txt"));
+        Scanner sc = new Scanner(new File("Kode/Input2.txt"));
 
         if (sc.hasNextInt()) m = sc.nextInt();
         if (sc.hasNextInt()) n = sc.nextInt();
@@ -49,18 +49,18 @@ public class GATester {
                 }
             }
         }
-
+        //mengubah arraylist lokasi kosong menjadi array 
         Fitness fitness = new Fitness(layout, rumah);
-
-        MyGA genetika = new MyGA(fitness, rumah, p, 0.8, 0.8, 6);
+        Kromosom.setStorageFit(fitness);
+        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.0015, 500);
           Kromosom bestKromosom = null;
 
-        for(int a=0;a<3;a++){
+        for(int a=0;a<100;a++){
             genetika.Genetics();
             bestKromosom = genetika.getBest();
-            System.out.printf("Generasi %d: Best Fitness (Total Jarak) = %.0f\n", a + 1, bestKromosom.getnewFitness());
+            System.out.printf("Generasi %d: Best Fitness (Total Jarak) = %.5f\n", a + 1, bestKromosom.getnewFitness());
         }
-
-
+        
+        
     }
 }

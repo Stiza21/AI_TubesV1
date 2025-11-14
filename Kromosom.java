@@ -9,7 +9,7 @@ public class Kromosom implements Comparable<Kromosom>{
     
     //mungkin lahankosong disini itu merupakan jumlah semua posisi lahan kosong yang bisa ditempati oleh firestation
     public Kromosom (House [] lokasiLahanKosong,int banyakFireStation) {
-        this.arrKromo = new House[lokasiLahanKosong.length];
+        this.arrKromo = new House[banyakFireStation];
         Random rdm=new Random();
         House [] lokasiGanda = lokasiLahanKosong.clone(); // Array buat naro nilai dari lokasikosong, buat jaga jaga
 
@@ -25,16 +25,28 @@ public class Kromosom implements Comparable<Kromosom>{
         konversiFitness();//langsung itung fitnessnya
     }
 
+public Kromosom(Kromosom other) {
+    this.arrKromo = new House[other.getArrKrom().length];
+    for (int i = 0; i < other.getArrKrom().length; i++) {
+        House h = other.getArrKrom()[i];
+        if (h != null) {
+            // buat salinan objek House baru jika House punya koordinat atau data sendiri
+            this.arrKromo[i] = new House(h.getx(), h.gety());
+        }
+    }
+    this.fitness = other.getnewFitness();
+}
     public Kromosom(House [] lokasiFireStation){
         this.arrKromo=lokasiFireStation;
     }
 
+    
     public static void setStorageFit (Fitness n) {
         storageHitunganFit = n;
     }
 
     public void konversiFitness () {
-        int jarakTotal = storageHitunganFit.f(this.arrKromo);//mengembalikan totalfitnesss dari 1 kromosom
+        double jarakTotal = storageHitunganFit.mean(this.arrKromo);//mengembalikan totalfitnesss dari 1 kromosom
         this.fitness=jarakTotal;
         // if (jarakTotal == 1) {
         //     this.fitness = Double.MAX_VALUE;
@@ -63,13 +75,17 @@ public class Kromosom implements Comparable<Kromosom>{
     public void setGene(int a,House input){
         this.arrKromo[a]=input;
     }
+    
 
 
 
     @Override
     public int compareTo(Kromosom o) {
-        if (this.fitness > o.fitness) return -1; 
-        if (this.fitness < o.fitness) return 1; 
+        if(o==null){
+            return 1;
+        }
+        if (this.fitness < o.fitness) return -1; 
+        if (this.fitness > o.fitness) return 1; 
         return 0;
     }
 
@@ -84,5 +100,4 @@ public class Kromosom implements Comparable<Kromosom>{
         Kromosom storage = (Kromosom)o;
         return Arrays.equals(arrKromo, storage.arrKromo);
     }
-
 }

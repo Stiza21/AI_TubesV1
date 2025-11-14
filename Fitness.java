@@ -80,6 +80,15 @@ public class Fitness {
         }
         return total;
     }
+    public double mean(House [] firestations) {
+        double totalDistance = f(firestations); 
+        if (houses.length == 0) {
+            return 0.0;
+        }
+        double mean =(double) totalDistance / (double) houses.length;
+
+        return mean;
+    }
 
     //for debugging
     public void printLayout(){

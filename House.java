@@ -15,4 +15,10 @@ public class House implements Comparable<House>{
     public int compareTo(House other){
         return (this.xCoordinate-other.xCoordinate)*80 + (this.yCoordinate-other.yCoordinate);
     }
+    public int getx(){
+        return xCoordinate;
+    }
+        public int gety(){
+        return yCoordinate;
+    }
 }

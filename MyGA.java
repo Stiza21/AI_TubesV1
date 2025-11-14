@@ -1,6 +1,8 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -22,15 +24,28 @@ private ArrayList <Kromosom> populasi;
         this.mutationRate=mutationRate;
         this.rdm = new Random();
         this.ukuranPopulasi=ukuranPopulasi;
+        this.fireStationNum=fireStationNum;
     }
 
     public void Genetics(){
-        population();
+         Kromosom.setStorageFit(this.fitness);
+        if (populasi == null || populasi.isEmpty()) {
+        population(); // hitung juga fitness-nya di dalam konstruktor Kromosom
+    }
+        Collections.sort(populasi);
         Kromosom best = populasi.get(0);//ELITISM AMBIL YANG TERBAIK
          Kromosom [] nextPopulation = new Kromosom[populasi.size()];//kromosom child
-         nextPopulation[0]= best ;//elitism
+         nextPopulation[0]= new Kromosom(best);//elitism
         CrossOver(nextPopulation);
         Mutasi(nextPopulation);
+        Collections.sort(populasi);
+        //setelah semua anak selesai dilahirkan itung nilai fitnessnya ulang
+            for (Kromosom krom : nextPopulation) {
+        krom.konversiFitness();
+         }
+        populasi.clear();
+        Collections.addAll(populasi, nextPopulation);
+        Collections.sort(populasi);
     }
 
 
@@ -39,39 +54,123 @@ private ArrayList <Kromosom> populasi;
         for (int i = 0; i < ukuranPopulasi; i++) {
             populasi.add(new Kromosom(lokasiKosong, fireStationNum));
         }
-       
-
     }
 
-    public void CrossOver(Kromosom [] nextPopulation){
+public void CrossOver(Kromosom[] nextPopulation) {
+    int index = 1; // index 0 = elitism
 
-         for(int a= 1;a<nextPopulation.length;a++){
-        double randomValue = rdm.nextDouble();//untuk menentukan apakah akan crossover atau tidak && double.rdmvalue diantara 0 sampai 1
-        if(randomValue<Crossrate){
-        Kromosom parent1 = Tournament();
-        Kromosom parent2 = Tournament();
-        Kromosom anak1 = new Kromosom(new House[fireStationNum]);
-        Kromosom anak2 = new Kromosom(new House[fireStationNum]);
-         int point = rdm.nextInt(parent1.getSize());//poin untuk crossover 
-                if(a<point){
-                   anak1.setGene(a,parent1.getGene(a));
-                   anak2.setGene(a,parent2.getGene(a));
-                }else{
-                   anak1.setGene(a,parent2.getGene(a));
-                   anak2.setGene(a,parent1.getGene(a));
+    while (index < nextPopulation.length) {
+        double randomValue = rdm.nextDouble();
+
+        if (randomValue < Crossrate) {
+            // Pilih dua parent secara acak lewat tournament
+            Kromosom parent1 = Tournament();
+            Kromosom parent2 = Tournament();
+
+            // Buat dua anak kosong
+            Kromosom anak1 = new Kromosom(new House[fireStationNum]);
+            Kromosom anak2 = new Kromosom(new House[fireStationNum]);
+
+            // Titik crossover di antara 1 dan (jumlah gen - 1)
+            int point = 1 + rdm.nextInt(fireStationNum - 1);
+
+            // Proses crossover
+            for (int b = 0; b < fireStationNum; b++) {
+                if (b < point) {
+                    anak1.setGene(b, parent1.getGene(b));
+                    anak2.setGene(b, parent2.getGene(b));
+                } else {
+                    anak1.setGene(b, parent2.getGene(b));
+                    anak2.setGene(b, parent1.getGene(b));
                 }
+            }
+            //hitung nilai fitness
+            anak1.konversiFitness();
+            anak2.konversiFitness();
+            repairChromosome(anak1);
+            repairChromosome(anak2);
+
+            // Simpan anak ke populasi baru
+            nextPopulation[index] = anak1;
+            if (index + 1 < nextPopulation.length) {
+                nextPopulation[index + 1] = anak2;
+            }
+            index += 2;
+
+        } else {
+            // Jika tidak crossover → copy langsung dari parent terbaik
+            nextPopulation[index] = new Kromosom(Tournament());
+            index++;
         }
-         }
     }
+}
+private int indexOfHouse(House h) {
+    for (int i = 0; i < lokasiKosong.length; i++) {
+        if (lokasiKosong[i].equals(h)) {
+            return i;
+        }
+    }
+    return -1; // tidak ditemukan
+}
+
+
+private void repairChromosome(Kromosom krom) {
+    House[] genes = krom.getArrKrom();
+
+    // Menandai lokasi kosong mana yang sudah dipakai
+    boolean[] used = new boolean[lokasiKosong.length];
+
+    // 1. Tandai yang sudah dipakai dalam kromosom (deteksi duplikasi)
+    for (int i = 0; i < genes.length; i++) {
+        House g = genes[i];
+        int idx = indexOfHouse(g);
+
+        if (idx != -1) {
+            if (!used[idx]) {
+                used[idx] = true; // pertama kali muncul → oke
+            } else {
+                // DUPLIKAT → set null dulu, nanti diisi
+                genes[i] = null;
+            }
+        } else {
+            // Jika gene tidak ditemukan di lokasiKosong → invalid → set null
+            genes[i] = null;
+        }
+    }
+
+    // 2. Isi posisi null dengan lokasi kosong yang belum digunakan
+    for (int i = 0; i < genes.length; i++) {
+        if (genes[i] == null) {
+            // cari lokasi kosong yang belum terpakai
+            int newIdx;
+            do {
+                newIdx = rdm.nextInt(lokasiKosong.length);
+            } while (used[newIdx]);
+
+            genes[i] = lokasiKosong[newIdx];
+            used[newIdx] = true;
+        }
+    }
+
+    // update kromosom
+    for (int i = 0; i < genes.length; i++) {
+        krom.setGene(i, genes[i]);
+    }
+
+    // 3. Hitung ulang fitness
+    krom.konversiFitness();
+}
+
+
 
     public Kromosom Tournament(){
-        Kromosom best = null;
-        int participantNum =3;
+        Kromosom best = populasi.get(rdm.nextInt(populasi.size()));
+        int participantNum =2;
 
          //pilih beberapa individu untuk ikut tournament   
         for(int a=0;a<participantNum;a++){
             Kromosom participant = populasi.get(rdm.nextInt(populasi.size()));
-            if(participant.compareTo(best)>0){//jika nilai fitness nya lebih kecil/lebih baik 
+            if(participant.getnewFitness() < best.getnewFitness()){//jika nilai fitness nya lebih kecil/lebih baik 
                 best=participant;
             }
         }
@@ -89,6 +188,8 @@ private ArrayList <Kromosom> populasi;
                 krom.setGene(j, newGene);
             }
         }
+         //setelah selesai mutasi gen itung ulang fitness
+        krom.konversiFitness();
     }
 }
 
