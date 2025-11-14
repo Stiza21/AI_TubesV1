@@ -139,7 +139,8 @@ public class MyHC {
 
     public static void main(String[] args) throws FileNotFoundException {
         // Random-restart Hill climbing
-        Scanner sc = new Scanner(new File("input.txt")); // read map from file
+        File inputFile = new File(args[0]);
+        Scanner sc = new Scanner(inputFile); // read map from file
         int m = sc.nextInt(); // panjang map
         int n = sc.nextInt(); // lebar map
         int p = sc.nextInt(); // banyak fire station
@@ -161,9 +162,9 @@ public class MyHC {
         }
         Fitness fitnessVal = new Fitness(map, house);
 
-        int mainSeed = (args.length > 1) ? Integer.parseInt(args[1]) : ThreadLocalRandom.current().nextInt(10000, 99999);
+        int mainSeed = (args.length > 2) ? Integer.parseInt(args[2]) : ThreadLocalRandom.current().nextInt(10000, 99999);
         Random seedRandomizer = new Random(mainSeed); //pilih seed secara random dengan rentang seperti pada parameter (random)
-        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[0]), seedRandomizer);//random
+        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[1]), seedRandomizer);//random
         double totalDist = 0.0;
         for (House home : house) {
             int minDist = Integer.MAX_VALUE;
