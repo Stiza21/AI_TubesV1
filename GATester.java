@@ -16,7 +16,7 @@ public class GATester {
         int[][] layout;
         House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
-        Scanner sc = new Scanner(new File("Kode/Input2.txt"));
+        Scanner sc = new Scanner(new File("Kode/Input3.txt"));
 
         if (sc.hasNextInt()) m = sc.nextInt();
         if (sc.hasNextInt()) n = sc.nextInt();
@@ -58,9 +58,15 @@ public class GATester {
         for(int a=0;a<100;a++){
             genetika.Genetics();
             bestKromosom = genetika.getBest();
-            System.out.printf("Generasi %d: Best Fitness (Total Jarak) = %.5f\n", a + 1, bestKromosom.getnewFitness());
         }
+            System.out.printf("jumlah fire stations %d: Best Fitness (Mean) = %.5f\n", p, bestKromosom.getnewFitness());
+            for (int i = 0; i < bestKromosom.getSize(); i++) {
+                House he = bestKromosom.getGene(i);
+                System.out.println("Firestation " + i +" : x = " + he.xCoordinate +", y = " + he.yCoordinate);
+}
         
         
-    }
+        
+    
+}
 }

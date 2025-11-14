@@ -40,7 +40,7 @@ private ArrayList <Kromosom> populasi;
         Mutasi(nextPopulation);
         Collections.sort(populasi);
         //setelah semua anak selesai dilahirkan itung nilai fitnessnya ulang
-            for (Kromosom krom : nextPopulation) {
+    for (Kromosom krom : nextPopulation) {
         krom.konversiFitness();
          }
         populasi.clear();
@@ -165,7 +165,7 @@ private void repairChromosome(Kromosom krom) {
 
     public Kromosom Tournament(){
         Kromosom best = populasi.get(rdm.nextInt(populasi.size()));
-        int participantNum =2;
+        int participantNum =3;
 
          //pilih beberapa individu untuk ikut tournament   
         for(int a=0;a<participantNum;a++){
