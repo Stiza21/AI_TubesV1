@@ -1,72 +1,51 @@
-
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
+import java.util.Scanner;
 
 public class Fitness {
-    public final int far=400;     //arbitrary number, ubah aja kalo mau
-    int[][] layout;
-    House[] houses;
-    int[][][] distances;
+    public final int far=100000;     //arbitrary number, ubah aja kalo mau
+    public int[][] layout;
+    public House[] houses;
+    public int banyakFireStation;
+    private int[][][] distances;
     
     public Fitness(int[][] layout, House[] houses){
         this.layout = layout;
         this.houses = houses;
+        this.calcDistances();
+    }
+    public Fitness(Scanner sc){
+        int banyakKolom,banyakBaris,banyakRumah,banyakPohon;
+        banyakKolom=sc.nextInt();
+        banyakBaris=sc.nextInt();
+        this.banyakFireStation=sc.nextInt();
+        banyakRumah=sc.nextInt();
+        banyakPohon=sc.nextInt();
+        this.houses = new House[banyakRumah];
+        //matriks layout memang tertranspose dari gambar koordinat yang biasanya agar input mudah
+        this.layout = new int[banyakKolom][banyakBaris];
+        for (int i=0;i<banyakRumah;i++){
+            this.houses[i] = new House(sc.nextInt()-1, sc.nextInt()-1);
+            this.layout[this.houses[i].xCoordinate][this.houses[i].yCoordinate]=1;
+        }
+        for (int i = 0; i < banyakPohon; i++) {
+            this.layout[sc.nextInt()-1][sc.nextInt()-1]=2;
+        }
+        this.calcDistances();
+    }
+    public void calcDistances(){
         this.distances =new int[houses.length][layout.length][layout[0].length];
         for (int i=0;i<houses.length;i++){
             for (int j=0;j<layout.length;j++){
                 for (int k=0;k<layout[0].length;k++){
-                    distances[i][j][k]=far;   
+                    distances[i][j][k]=160*far;   
                 }
             }
         }
-        calcDistances();
-    }
-    public void calcDistances(){
-        for (int i=0;i<distances.length;i++){
-            bfs(houses[i],distances[i]);
-        }
-    }
-    public void bfs (House house, int distancesFromHouse[][]){
-        Queue<House> queue = new LinkedList<>();
-        distancesFromHouse[house.xCoordinate][house.yCoordinate]=0;
-        queue.offer(house);
-        while(!queue.isEmpty()){
-
-            for (int i=queue.size();i>0;i--){
-                House top = queue.poll();
-                if (top.xCoordinate+1<layout.length){
-                    if (distancesFromHouse[top.xCoordinate+1][top.yCoordinate]==far){
-                        if (layout[top.xCoordinate+1][top.yCoordinate]==0){
-                            distancesFromHouse[top.xCoordinate+1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate+1,top.yCoordinate));
-                        }
-                    }
-                }
-                if (top.xCoordinate-1>=0){
-                    if (distancesFromHouse[top.xCoordinate-1][top.yCoordinate]==far){
-                        if (layout[top.xCoordinate-1][top.yCoordinate]==0){
-                            distancesFromHouse[top.xCoordinate-1][top.yCoordinate]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate-1,top.yCoordinate));
-                        }
-                    }
-                }
-                if (top.yCoordinate+1<layout[0].length){
-                    if (distancesFromHouse[top.xCoordinate][top.yCoordinate+1]==far){
-                        if (layout[top.xCoordinate][top.yCoordinate+1]==0){
-                            distancesFromHouse[top.xCoordinate][top.yCoordinate+1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate,top.yCoordinate+1));
-                        }
-                    }
-                }
-                if (top.yCoordinate-1>=0){
-                    if (distancesFromHouse[top.xCoordinate][top.yCoordinate-1]==far){
-                        if (layout[top.xCoordinate][top.yCoordinate-1]==0){
-                            distancesFromHouse[top.xCoordinate][top.yCoordinate-1]=distancesFromHouse[top.xCoordinate][top.yCoordinate]+1;
-                            queue.offer(new House(top.xCoordinate,top.yCoordinate-1));
-                        }
-                    }
-                }
-            } 
+        // for (int i=0;i<distances.length;i++){
+        //     bfs(houses[i],distances[i]);
+        // }
+        for (int i = 0; i < distances.length; i++) {
+            djikstra(houses[i], distances[i]);
         }
     }
     public int f(House[] firestations){
@@ -80,16 +59,21 @@ public class Fitness {
         }
         return total;
     }
-    public double mean(House [] firestations) {
-        double totalDistance = f(firestations); 
-        if (houses.length == 0) {
-            return 0.0;
+
+    public void djikstra(House source, int distancesFromHouse[][]){
+        PriorityQueue<House> pq = new PriorityQueue<>();
+        pq.add(new House(source.xCoordinate,source.yCoordinate,0));
+        while(!pq.isEmpty()){
+            House top = pq.poll();
+            // System.out.println(top.xCoordinate+" "+top.yCoordinate);
+            if (distancesFromHouse[top.xCoordinate][top.yCoordinate]<=top.distance) continue;
+            distancesFromHouse[top.xCoordinate][top.yCoordinate]=top.distance;
+            if (top.xCoordinate>0) pq.offer(new House(top.xCoordinate-1, top.yCoordinate, top.distance+1+(layout[top.xCoordinate-1][top.yCoordinate]==0?0:far)));
+            if (top.xCoordinate<layout.length-1) pq.offer(new House(top.xCoordinate+1, top.yCoordinate, top.distance+1+(layout[top.xCoordinate+1][top.yCoordinate]==0?0:far)));
+            if (top.yCoordinate>0) pq.offer(new House(top.xCoordinate, top.yCoordinate-1, top.distance+1+(layout[top.xCoordinate][top.yCoordinate-1]==0?0:far)));
+            if (top.yCoordinate<layout[0].length-1) pq.offer(new House(top.xCoordinate, top.yCoordinate+1, top.distance+1+(layout[top.xCoordinate][top.yCoordinate+1]==0?0:far)));
         }
-        double mean =(double) totalDistance / (double) houses.length;
-
-        return mean;
     }
-
     //for debugging
     public void printLayout(){
         for (int i=layout[0].length-1;i>=0;i--){
@@ -110,4 +94,14 @@ public class Fitness {
             }
         }
     }
+        public double mean(House [] firestations) {
+        double totalDistance = f(firestations); 
+        if (houses.length == 0) {
+            return 0.0;
+        }
+        double mean =(double) totalDistance / (double) houses.length;
+
+        return mean;
+    }
+
 }
