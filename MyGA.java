@@ -11,13 +11,15 @@ private Fitness fitness;
 private static House [] lokasiKosong;
 private double Crossrate;
 private double mutationRate;
+private double elitismRate;
 private static int fireStationNum;
 private int ukuranPopulasi;
 private Random rdm;
 private ArrayList <Kromosom> populasi;
+private Kromosom [] nextPopulation;
 
 //population berisi arrayList
-    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,int ukuranPopulasi){
+    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,double elitismRate,int ukuranPopulasi){
         this.fitness=fitness;
         this.lokasiKosong=lokasiKosong;
         this.Crossrate=Crossrate;
@@ -25,6 +27,7 @@ private ArrayList <Kromosom> populasi;
         this.rdm = new Random();
         this.ukuranPopulasi=ukuranPopulasi;
         this.fireStationNum=fireStationNum;
+        this.elitismRate = elitismRate;
     }
 
     public void Genetics(){
@@ -32,12 +35,11 @@ private ArrayList <Kromosom> populasi;
         if (populasi == null || populasi.isEmpty()) {
         population(); // hitung juga fitness-nya di dalam konstruktor Kromosom
     }
+       this.nextPopulation = new Kromosom[populasi.size()];//kromosom child
         Collections.sort(populasi);
-        Kromosom best = populasi.get(0);//ELITISM AMBIL YANG TERBAIK
-         Kromosom [] nextPopulation = new Kromosom[populasi.size()];//kromosom child
-         nextPopulation[0]= new Kromosom(best);//elitism
-        CrossOver(nextPopulation);
-        Mutasi(nextPopulation);
+        int elitismCount=elitism();
+        CrossOver(nextPopulation,elitismCount);
+        Mutasi(nextPopulation,elitismCount);
         Collections.sort(populasi);
         //setelah semua anak selesai dilahirkan itung nilai fitnessnya ulang
     for (Kromosom krom : nextPopulation) {
@@ -48,6 +50,17 @@ private ArrayList <Kromosom> populasi;
         Collections.sort(populasi);
     }
 
+    public int elitism(){
+        // Pastikan tidak melebihi ukuran populasi
+        int elitismCount = (int) Math.min(ukuranPopulasi, Math.ceil(ukuranPopulasi * elitismRate));
+        if (elitismCount < 1) elitismCount = 1; // Opsi: Pastikan minimal 1 elite
+        for(int i = 0; i < elitismCount; i++) {
+            // Salin kromosom terbaik (populasi.get(i)) ke posisi awal nextPopulation
+            nextPopulation[i] = new Kromosom(populasi.get(i));
+        }
+        return elitismCount;
+    }
+
 
     public void population(){
              populasi = new ArrayList<>();//dibuat arraylist karena jumlah firestation pada awalnya tidak diketahui
@@ -56,8 +69,8 @@ private ArrayList <Kromosom> populasi;
         }
     }
 
-public void CrossOver(Kromosom[] nextPopulation) {
-    int index = 1; // index 0 = elitism
+public void CrossOver(Kromosom[] nextPopulation,int startIndex) {
+    int index = startIndex; // index 0 = elitism
 
     while (index < nextPopulation.length) {
         double randomValue = rdm.nextDouble();
@@ -177,8 +190,8 @@ private void repairChromosome(Kromosom krom) {
         return best;
     }
 
-       public void Mutasi(Kromosom [] nextPopulation) {
-    for (int i = 1; i < nextPopulation.length; i++) { //index 0 untuk elitism
+       public void Mutasi(Kromosom [] nextPopulation,int startIndex) {
+    for (int i = startIndex; i < nextPopulation.length; i++) { //index 0 untuk elitism
         Kromosom krom = nextPopulation[i];
         for (int j = 0; j < fireStationNum; j++) {
             double r = rdm.nextDouble(); //mengambil nilai 0 sampai 1 untuk perbandingan dengan mutationrate
@@ -195,13 +208,7 @@ private void repairChromosome(Kromosom krom) {
 
 
     public Kromosom getBest() {
-        Kromosom best = null;
-        for (Kromosom k : populasi) {
-            if (best == null ||k.getnewFitness() < best.getnewFitness()) {
-                best = k;
-            }
-        }
-        return best;
+        return populasi.get(0);
     }
 
  

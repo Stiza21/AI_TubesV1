@@ -3,7 +3,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Fitness {
-    public final int far=80085;     //arbitrary number, ubah aja kalo mau
+    public final int far=400;     //arbitrary number, ubah aja kalo mau
     int[][] layout;
     House[] houses;
     int[][][] distances;

@@ -52,18 +52,30 @@ public class GATester {
         //mengubah arraylist lokasi kosong menjadi array 
         Fitness fitness = new Fitness(layout, rumah);
         Kromosom.setStorageFit(fitness);
-        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.0015, 500);
+        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.001,0.10,50);
           Kromosom bestKromosom = null;
 
         for(int a=0;a<100;a++){
             genetika.Genetics();
             bestKromosom = genetika.getBest();
+
         }
-            System.out.printf("jumlah fire stations %d: Best Fitness (Mean) = %.5f\n", p, bestKromosom.getnewFitness());
-            for (int i = 0; i < bestKromosom.getSize(); i++) {
-                House he = bestKromosom.getGene(i);
-                System.out.println("Firestation " + i +" : x = " + he.xCoordinate +", y = " + he.yCoordinate);
-}
+
+             System.out.printf("jumlah fire stations %d: Best Fitness (Mean) = %.5f\n", p, bestKromosom.getnewFitness());
+        //     for (int i = 0; i < bestKromosom.getSize(); i++) {
+        //         House house = bestKromosom.getGene(i);
+        //         System.out.println("Firestation " + i +" : x = " + house.xCoordinate +", y = " + house.yCoordinate);
+        //        layout[house.xCoordinate][house.yCoordinate]=7;
+        // }
+
+        // for(int baris=0;baris<m;baris++){
+        //     for(int kolom=0;kolom<n;kolom++){
+        //         System.out.print(layout[baris][kolom]+" ");
+        //     }
+        //     System.out.println();
+        // }
+           
+
         
         
         
