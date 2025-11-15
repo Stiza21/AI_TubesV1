@@ -1,9 +1,15 @@
 public class House implements Comparable<House>{
-    int xCoordinate,yCoordinate;
+    int xCoordinate,yCoordinate, distance;
 
     public House(int xCoordinate, int yCoordinate){
         this.xCoordinate=xCoordinate;
         this.yCoordinate=yCoordinate;
+        this.distance=0;
+    }
+    public House(int xCoordinate, int yCoordinate, int distance){
+        this.xCoordinate=xCoordinate;
+        this.yCoordinate=yCoordinate;
+        this.distance=distance;
     }
     @Override
     public boolean equals(Object other){
@@ -13,12 +19,6 @@ public class House implements Comparable<House>{
     }
     @Override
     public int compareTo(House other){
-        return (this.xCoordinate-other.xCoordinate)*80 + (this.yCoordinate-other.yCoordinate);
-    }
-    public int getx(){
-        return xCoordinate;
-    }
-        public int gety(){
-        return yCoordinate;
+        return this.distance-other.distance;
     }
 }
