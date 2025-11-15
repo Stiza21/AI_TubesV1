@@ -16,7 +16,7 @@ public class GATester {
         int[][] layout;
         House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
-        Scanner sc = new Scanner(new File("Kode/Input3.txt"));
+        Scanner sc = new Scanner(new File("Kode/Input2.txt"));
 
         if (sc.hasNextInt()) m = sc.nextInt();
         if (sc.hasNextInt()) n = sc.nextInt();
