@@ -166,15 +166,15 @@ public class MyHC {
         Random seedRandomizer = new Random(mainSeed); //pilih seed secara random dengan rentang seperti pada parameter (random)
         House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[1]), seedRandomizer);//random
         double totalDist = 0.0;
-        for (House home : house) {
+        for (int i = 0; i < house.length; i++) {
             int minDist = Integer.MAX_VALUE;
             for (House fireStation : bestStations) {
-                int d = fitnessVal.distances[Arrays.asList(house).indexOf(home)][fireStation.xCoordinate][fireStation.yCoordinate];
-                if (d < minDist)
-                    minDist = d;
+                int d = fitnessVal.getDistance(i, fireStation);
+                minDist = Math.min(minDist, d);
             }
             totalDist += minDist;
         }
+
         
         double avgDist = totalDist / h; //cari rata2 terdekat untuk jarak rumah dengan fire station
         System.out.println("Main seed : " + mainSeed);
