@@ -164,7 +164,7 @@ public class MyHC {
 
         int mainSeed = (args.length > 2) ? Integer.parseInt(args[2]) : ThreadLocalRandom.current().nextInt(10000, 99999);
         Random seedRandomizer = new Random(mainSeed); //pilih seed secara random dengan rentang seperti pada parameter (random)
-        House[] bestStations = randomRestartHC(20, fitnessVal, map, p, Integer.parseInt(args[1]), seedRandomizer);//random
+        House[] bestStations = randomRestartHC(1000, fitnessVal, map, p, Integer.parseInt(args[1]), seedRandomizer);//random
         double totalDist = 0.0;
         for (int i = 0; i < house.length; i++) {
             int minDist = Integer.MAX_VALUE;
