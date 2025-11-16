@@ -14,7 +14,8 @@ public class GATester {
         int[][] layout;
         House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
-        Scanner sc = new Scanner(new File("Kode/Input2.txt"));
+        File inputFile = new File(args[0]);  
+        Scanner sc = new Scanner(inputFile);
 
         if (sc.hasNextInt()) m = sc.nextInt();
         if (sc.hasNextInt()) n = sc.nextInt();
@@ -47,16 +48,22 @@ public class GATester {
                 }
             }
         }
+        //untuk crossrate,mutation rate ,elitismRate,dan ukuranpopulasi
+        double crossRate =Double.valueOf(args[1]);
+        double mutationRate=Double.valueOf(args[2]);
+        double elitismRate=Double.valueOf(args[3]);
+        int populationNum=Integer.valueOf(args[4]);
+        int generasi=Integer.valueOf(args[4]);
         Random rdm = new Random();
         //mengubah arraylist lokasi kosong menjadi array 
         Fitness fitness = new Fitness(layout, rumah);
         Kromosom.setStorageFit(fitness);
-        int seed = rdm.nextInt();
+        int seed = rdm.nextInt();//input seed disini
         System.out.println("Seed for current run: " + seed);
-        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.001,0.10,500,seed);
+        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, crossRate, mutationRate,elitismRate,populationNum,seed);
           Kromosom bestKromosom = null;
 
-        for(int a=0;a<100;a++){
+        for(int a=0;a<generasi;a++){
             genetika.Genetics();
             bestKromosom = genetika.getBest();
 

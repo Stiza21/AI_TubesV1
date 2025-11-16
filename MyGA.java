@@ -19,7 +19,7 @@ private ArrayList <Kromosom> populasi;
 private Kromosom [] nextPopulation;
 
 //population berisi arrayList
-    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,double elitismRate,int ukuranPopulasi,long seed){
+    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,double elitismRate,int ukuranPopulasi,int seed){
         this.fitness=fitness;
         this.lokasiKosong=lokasiKosong;
         this.Crossrate=Crossrate;
