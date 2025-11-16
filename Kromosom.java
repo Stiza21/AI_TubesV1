@@ -8,14 +8,14 @@ public class Kromosom implements Comparable<Kromosom>{
     private static Fitness storageHitunganFit;
     
     //mungkin lahankosong disini itu merupakan jumlah semua posisi lahan kosong yang bisa ditempati oleh firestation
-    public Kromosom (House [] lokasiLahanKosong,int banyakFireStation) {
+    public Kromosom (House [] lokasiLahanKosong,int banyakFireStation,Random rdmSource) {
+
         this.arrKromo = new House[banyakFireStation];
-        Random rdm=new Random();
         House [] lokasiGanda = lokasiLahanKosong.clone(); // Array buat naro nilai dari lokasikosong, buat jaga jaga
 
         //fungsi ini untuk shuffle urutan firestation yang ada pada lokasiGanda
         for (int i = 0; i < lokasiLahanKosong.length; i++) {
-            int j = rdm.nextInt(i + 1);
+            int j = rdmSource.nextInt(i + 1);
             House storage = lokasiGanda[i];
             lokasiGanda[i] = lokasiGanda[j];
             lokasiGanda[j] = storage;
@@ -31,7 +31,7 @@ public Kromosom(Kromosom other) {
         House h = other.getArrKrom()[i];
         if (h != null) {
             // buat salinan objek House baru jika House punya koordinat atau data sendiri
-            this.arrKromo[i] = new House(h.getx(), h.gety());
+            this.arrKromo[i] = new House(h.xCoordinate, h.yCoordinate);
         }
     }
     this.fitness = other.getnewFitness();

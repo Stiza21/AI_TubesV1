@@ -3,16 +3,14 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.Random;
 public class GATester {
     public static void main(String[] args) throws FileNotFoundException {
-
         int m = 0;
         int n = 0;
         int p = 0;
         int h = 0;
         int t = 0;
-
         int[][] layout;
         House[] rumah;
         List<House> lokasiKosong = new ArrayList<>();
@@ -49,10 +47,13 @@ public class GATester {
                 }
             }
         }
+        Random rdm = new Random();
         //mengubah arraylist lokasi kosong menjadi array 
         Fitness fitness = new Fitness(layout, rumah);
         Kromosom.setStorageFit(fitness);
-        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.001,0.10,50);
+        int seed = rdm.nextInt();
+        System.out.println("Seed for current run: " + seed);
+        MyGA genetika = new MyGA(fitness,lokasiKosong.toArray(new House[0]), p, 0.8, 0.001,0.10,500,seed);
           Kromosom bestKromosom = null;
 
         for(int a=0;a<100;a++){
@@ -64,7 +65,7 @@ public class GATester {
              System.out.printf("jumlah fire stations %d: Best Fitness (Mean) = %.5f\n", p, bestKromosom.getnewFitness());
         //     for (int i = 0; i < bestKromosom.getSize(); i++) {
         //         House house = bestKromosom.getGene(i);
-        //         System.out.println("Firestation " + i +" : x = " + house.xCoordinate +", y = " + house.yCoordinate);
+        //         //System.out.println("Firestation " + i +" : x = " + house.xCoordinate +", y = " + house.yCoordinate);
         //        layout[house.xCoordinate][house.yCoordinate]=7;
         // }
 
@@ -74,11 +75,5 @@ public class GATester {
         //     }
         //     System.out.println();
         // }
-           
-
-        
-        
-        
-    
 }
 }

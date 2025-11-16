@@ -19,12 +19,12 @@ private ArrayList <Kromosom> populasi;
 private Kromosom [] nextPopulation;
 
 //population berisi arrayList
-    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,double elitismRate,int ukuranPopulasi){
+    public MyGA(Fitness fitness,House [] lokasiKosong,int fireStationNum,double Crossrate,double mutationRate,double elitismRate,int ukuranPopulasi,long seed){
         this.fitness=fitness;
         this.lokasiKosong=lokasiKosong;
         this.Crossrate=Crossrate;
         this.mutationRate=mutationRate;
-        this.rdm = new Random();
+       this.rdm = new Random(seed);
         this.ukuranPopulasi=ukuranPopulasi;
         this.fireStationNum=fireStationNum;
         this.elitismRate = elitismRate;
@@ -65,7 +65,7 @@ private Kromosom [] nextPopulation;
     public void population(){
              populasi = new ArrayList<>();//dibuat arraylist karena jumlah firestation pada awalnya tidak diketahui
         for (int i = 0; i < ukuranPopulasi; i++) {
-            populasi.add(new Kromosom(lokasiKosong, fireStationNum));
+            populasi.add(new Kromosom(lokasiKosong, fireStationNum,this.rdm));
         }
     }
 
